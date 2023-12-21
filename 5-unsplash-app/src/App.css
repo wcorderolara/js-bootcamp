@@ -1,0 +1,8 @@
+.li-gallery {
+    height: 40vh;
+}
+
+.gallery-image {
+    object-fit: cover;
+    vertical-align: middle;
+}
