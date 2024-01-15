@@ -2,17 +2,17 @@ import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
 import { getContacts, createContact } from "../../controllers/contacts";
 
 export async function loader() {
-    const contacts = await getContacts();
-    return { contacts } 
+  const contacts = await getContacts();
+  return { contacts };
 }
 
 export async function action() {
-    const contact = await createContact();
-    return { contact }
+  const contact = await createContact();
+  return { contact };
 }
 
 function Contacts() {
-    const { contacts } = useLoaderData();
+  const { contacts } = useLoaderData();
   return (
     <>
       <div id="sidebar">
@@ -32,34 +32,32 @@ function Contacts() {
           </Form>
         </div>
         <nav>
-           {
-            contacts.length ? (
-                <ul>
-                    {
-                        contacts.map( (contact) => {
-                            <li key={contact.id}>
-                                <Link to={`contacta/${contact.id}`}>
-                                   { contact.first || contact.last ? (
-                                    <>
-                                        {contact.first} {contact.last}
-                                    </>
-                                   ): (
-                                    <i>Sin Nombre ni Apellido</i>
-                                   )} {" "}
-                                   {contact.favorite && <span>★</span>}
-                                </Link>
-                            </li>
-                        })
-                    }
-                </ul>
-            ): (
-                <p><i>No Hay Contactos</i></p>
-            )
-           }
+          {contacts.length ? (
+            <ul>
+              {contacts.map((contact) => (
+                <li key={contact.id}>
+                  <Link to={`contacts/${contact.id}`}>
+                    {contact.first || contact.last ? (
+                      <>
+                        {contact.first} {contact.last}
+                      </>
+                    ) : (
+                      <i>Sin Nombre ni Apellido</i>
+                    )}{" "}
+                    {contact.favorite && <span>★</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              <i>No Hay Contactos</i>
+            </p>
+          )}
         </nav>
       </div>
       <div id="detail">
-        <Outlet/>
+        <Outlet />
       </div>
     </>
   );
