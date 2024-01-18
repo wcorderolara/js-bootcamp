@@ -1,10 +1,25 @@
+/* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable react/prop-types */
-import { Form } from "react-router-dom";
+import { Form, useLoaderData, useFetcher } from "react-router-dom";
+import { getContact, updateContact } from "../../../controllers/contacts";
+
+export async function loader({ params }) {
+  const contact = await getContact(params.contactId);
+  return { contact };
+}
+
+export async function action ({request, params}) {
+    let formData = await request.formData();
+    return updateContact(params.contactId, {
+        favorite: formData.get("favorite") === "true"
+    })
+}
 
 function Favorite({ contact }) {
+  const fetcher = useFetcher();
   let favorite = contact.favorite;
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
       <button
         name="favorite"
         value={favorite ? "false" : "true"}
@@ -12,20 +27,12 @@ function Favorite({ contact }) {
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
   );
-  f;
 }
 
 function Contact() {
-  const contact = {
-    first: "Your",
-    last: "Name",
-    avatar: "https://picsum.photos/200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
+  const { contact } = useLoaderData();
   return (
     <div id="contact">
       <div>
@@ -39,7 +46,7 @@ function Contact() {
               {contact.first} {contact.last}
             </>
           ) : (
-            <i>No Name</i>
+            <i>John Doe (Placeholder)</i>
           )}{" "}
           <Favorite contact={contact} />
         </h1>

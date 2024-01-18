@@ -25,6 +25,35 @@ function set(contacts) {
   return localforage.setItem("contacts", contacts);
 }
 
+export async function getContact(id) {
+    await fakeNetwork(`contact: ${id}`);
+    let contacts = await localforage.getItem("contacts");
+    let contact = contacts.find(contact => contact.id === id);
+    return contact ?? null;
+}
+
+export async function updateContact(id, updateInfo) {
+    await fakeNetwork(`contact: ${id}`);
+    let contacts = await localforage.getItem("contacts");
+    let contact = contacts.find(contact => contact.id === id);
+    if(!contact) throw new Error("Contacto no encontrado");
+    Object.assign(contact, updateInfo);
+    await set(contacts);
+    return contact;
+}
+
+export async function deleteContact(id) {
+    let contacts = await localforage.getItem("contacts");
+    let index = contacts.findIndex( contact => contact.id === id);
+    if (index > -1) {
+        contacts.splice(index, 1);
+        await set(contacts);
+        return true;
+    }
+
+    return false;
+}
+
 let fakeCache = {};
 
 async function fakeNetwork(key) {
