@@ -1,10 +1,6 @@
 const User = require("../models")["User"];
 const models = require("../models");
 
-exports.createUser = async (req, res) => {};
-
-exports.loginUser = async (req, res) => {};
-
 exports.getUserReviews = async (req, res) => {
   try {
     const user = await User.findOne({
