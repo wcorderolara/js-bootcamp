@@ -34,13 +34,50 @@ exports.loginUser = async (req, res) => {
             return res.sendErrorResponse('La constraseña no es la correcta', 401);
         }
 
-        const token = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '24h'});
+        if (user) {
+            const token = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '15m'});
+            const refreshToken = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_REFRESH_TOKEN, {expiresIn: '7d'});
 
-        return res.sendSuccessResponse(token)
+            user.refreshToken = refreshToken;
+            await user.save();
+            return res.sendSuccessResponse({token, refreshToken});
+        }
 
     } catch (error) {
         res.sendErrorResponse(error.message, 500);
     }
 };
+
+exports.token = async(req, res) => {
+    const { refreshToken } = req.body;
+
+    if(refreshToken == null) {
+        return res.sendErrorResponse('No tiene refresh Token', 401);
+    }
+
+    const user = await User.findOne({where: { refreshToken }});
+
+    if(!user) {
+        return res.sendErrorResponse('Refresh Token Invalido', 403);
+    }
+
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN, (err, user) => {
+        if (err) {
+            return res.sendErrorResponse('Refresh Token invalido', 403);
+        }
+        const token = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '5m'});
+        return res.sendSuccessResponse({token});
+    })
+}
+
+exports.logout = async(req, res) => {
+    const {refreshToken} = req.body;
+    const user = await User.findOne({where: {refreshToken}});
+    if(user) {
+        user.refreshToken = null;
+        await user.save();
+    }
+    res.sendStatus(204);
+}
 
 

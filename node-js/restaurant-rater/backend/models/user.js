@@ -51,6 +51,11 @@ module.exports = (sequelize, DataTypes) => {
             status: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: true
+            },
+            refreshToken: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+                field: 'refresh_token'
             }
         }, {
             sequelize,

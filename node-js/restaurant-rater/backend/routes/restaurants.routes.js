@@ -3,6 +3,9 @@ const router = express.Router();
 const {getRestaurants, createRestaurant, massiveCreate, getRestaurantById, putRestaurant} = require('../controllers/restaurant.controller');
 const { createRestaurantValidator, getRestaurantByIdValidator } = require('../validators/restaurant.vailidator');
 const { handleValidationResult } = require('../validators/middleware.validator');
+const authenticateToken = require('../utils/middleware/authenticateToken');
+const checkRole = require('../utils/middleware/checkRole');
+
 /**
  * @swagger
  *  components:
@@ -68,6 +71,12 @@ const { handleValidationResult } = require('../validators/middleware.validator')
  */
 router.get('/', getRestaurants);
 
+// router.get('/',
+//     authenticateToken,
+//     checkRole(['read']),
+//     getRestaurants
+// );
+
 /**
  * @swagger
  * /restaurants/{restaurantId}:
@@ -112,7 +121,13 @@ router.get('/:restaurantId', getRestaurantByIdValidator(), handleValidationResul
  *                      schema:
  *                         $ref: '#/components/schemas/Restaurant'                
  */
-router.post('/', createRestaurantValidator(), handleValidationResult, createRestaurant);
+router.post('/',
+    authenticateToken,
+    checkRole(['create']),
+    createRestaurantValidator(), 
+    handleValidationResult, 
+    createRestaurant
+);
 
 // POST /restaurants/bulk
 router.post('/bulk', massiveCreate);
