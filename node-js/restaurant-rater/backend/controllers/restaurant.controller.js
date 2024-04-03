@@ -2,6 +2,7 @@
  * CRUD = Create Read Update Delete
  */
 const Restaurant = require('../models')['Restaurant'];
+const RestaurantSchedule = require('../models')['RestaurantSchedule'];
 const {sequelize} = require('../models');
 
 exports.getRestaurants = async(req, res) => {
@@ -60,7 +61,13 @@ exports.getRestaurantById = async(req, res) => {
         const restaurantItem = await Restaurant.findOne({
             where: {
                 id: req.params.restaurantId
-            }
+            },
+            include: [
+                {
+                    model: RestaurantSchedule,
+                    attributes: ['days', 'schedule']
+                }
+            ]
         });
 
         if(!restaurantItem) {

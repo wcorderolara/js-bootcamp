@@ -7,7 +7,7 @@ export async function fetchRestaurants() {
     return restaurants;
 }
 
-export async function fetRestaurantById(restaurantId) {
+export async function fetchRestaurantById(restaurantId) {
     const response = await axios.get(`${config.baseUrl}/restaurants/${restaurantId}`);
     const restaurant = response.data;
 

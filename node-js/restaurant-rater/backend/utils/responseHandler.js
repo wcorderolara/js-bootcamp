@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
             status,
             data
         });
-    };
+};
 
     res.sendErrorResponse = (message, status = 400) => {
         res.status(status).json({

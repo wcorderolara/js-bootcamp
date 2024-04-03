@@ -1,14 +1,27 @@
-import { StyleSheet, Text, View, Pressable, Image, Platform } from 'react-native'
+import { StyleSheet, Text, View, Pressable, Image, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const RestaurantTile = ({id, name, logo, address}) => {
+  const navigation = useNavigation();
+
+  function onSelectRestaurantHandler() {
+    navigation.navigate('RestaurantInfo', {
+      screen: 'RestaurantDetails',
+      params: {
+        restaurantId: id
+      }
+    });
+  }
+
   return (
     <View style={styles.restaurantItem}>
         <Pressable
-            android_ripple={{ color: "#fbce9c"}}
+            android_ripple={{ color: "#fef9c3"}}
             style={ ({pressed}) => [
                 styles.button,
                 pressed ? styles.buttonPressed : null
             ]}
+            onPress={onSelectRestaurantHandler}
         >
             <View style={styles.innerContainer}>
                 <Image
@@ -47,7 +60,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonPressed: {
-    backgroundColor: "#fbce9c",
+    backgroundColor: "#fef9c3",
     opacity: 0.25,
   },
   innerContainer: {

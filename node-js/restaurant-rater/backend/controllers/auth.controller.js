@@ -14,9 +14,21 @@ exports.createUser = async (req, res) => {
             salt,
             hash
         });
-        res.sendSuccessResponse(user, 201);
+
+        if(user) {
+            const token = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1d'});
+            res.sendSuccessResponse({token, user: {username: user.username, role: user.role, id: user.id, email: user.email}}, 201);
+        }
+
     } catch (error) {
-        res.sendErrorResponse(error.message, 500);
+        let message
+        if(error.parent.code == 'ER_DUP_ENTRY' && error.errors[0].path == 'email') {
+            message = "El correo electronico ya tiene una cuenta creada"
+        } else {
+            message = error.message;
+        }
+        console.log(message);
+        res.sendErrorResponse(message, 500);
     }
 };
 
@@ -31,16 +43,16 @@ exports.loginUser = async (req, res) => {
         
         const hash = crypto.pbkdf2Sync(password, user.salt, 1000, 64, 'sha512').toString('hex');
         if(user.hash !== hash) {
-            return res.sendErrorResponse('La constraseña no es la correcta', 401);
+            return res.sendErrorResponse('La contraseña no es correcta', 401);
         }
 
         if (user) {
-            const token = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '15m'});
+            const token = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1d'});
             const refreshToken = jwt.sign({userId: user.id, role: user.role}, process.env.JWT_REFRESH_TOKEN, {expiresIn: '7d'});
 
             user.refreshToken = refreshToken;
             await user.save();
-            return res.sendSuccessResponse({token, refreshToken});
+            return res.sendSuccessResponse({token, user: {username: user.username, role: user.role, id: user.id, email: user.email}});
         }
 
     } catch (error) {
